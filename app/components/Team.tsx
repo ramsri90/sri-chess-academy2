@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 const TEAM = [
   {
@@ -35,32 +35,37 @@ const TEAM = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
+};
+
 export default function Team() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section id="team" className="section-padding section-dark">
       <div className="max-w-6xl mx-auto">
-        <div
-          ref={ref}
-          className={`transition-all duration-500 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+          }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
             Our Team
@@ -68,27 +73,33 @@ export default function Team() {
           <p className="text-gray-400 text-center max-w-lg mx-auto mb-12">
             Meet our dedicated coaches guiding students toward chess mastery
           </p>
+        </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TEAM.map((member, i) => (
-              <div
-                key={i}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-8 text-center hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 group border border-white/5"
-                style={{ transitionDelay: `${i * 100}ms` }}
-              >
-                <div className="text-5xl mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:animate-float">
-                  {member.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {member.name}
-                </h3>
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  {member.role}
-                </p>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          {TEAM.map((member, i) => (
+            <motion.div
+              key={i}
+              variants={itemVariants}
+              className="bg-white/5 backdrop-blur-sm rounded-xl p-8 text-center hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 group border border-white/5"
+            >
+              <div className="text-5xl mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:animate-float">
+                {member.icon}
               </div>
-            ))}
-          </div>
-        </div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {member.name}
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {member.role}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
